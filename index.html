@@ -1,0 +1,281 @@
+<html>
+
+<head>
+    <title>Projects - Shopping Cart - JQuery</title>
+</head>
+
+<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+        //1. Build login panel
+        $("document").ready(function () {
+            $("body").css({
+                "margin": "0",
+                "padding": "0",
+                "box-sizing": "border-box"
+            })
+
+            //10.1 Default item
+            addItem[0].value = "Milk";
+            addCost[0].value = 5;
+            addItemToList();
+        });
+
+        const panel = $("<div></div>").css({
+            "background-color": "orange"
+        });
+
+        const panelCon = $("<div></div>").css({
+            "width": "700px",
+            "height": "auto",
+            "margin": "auto",
+            "padding-top": "30px"
+        });
+
+        const title = $("<h2>Shopping.Cartz</h2>").css({
+            "color": "black",
+            "display": "inline-block"
+        });
+
+        const login = $("<input type='text' name='login' placeholder='Enter password' value=''>").css({
+            "display": "inline-block",
+            "margin-left": "10%"
+        });
+
+        //2. Login & sign up button
+        const loginBtn = $("<button><b>Login</b></button>").css({
+            "display": "inline-block"
+        }).on("click", function () {
+            if (login[0].value === pwdObj.name) {
+                $(addCon).show();
+                login[0].value = "";
+                $(loginBtn).hide();
+                $(signUpBtn).hide();
+                $(logoutBtn).show();
+                $(chgPwdBtn).show();
+                $(regPanel).hide();
+                alert("You have logged in successfully.")
+            } else {
+                login[0].value = "";
+                alert("Invalid password.");
+            }
+        });
+
+        const signUpBtn = $("<button><b>Sign Up</b></button>").css({
+            "display": "inline-block"
+        }).on("click", function () {
+            $(regPanel).show();
+        });
+
+        //3. Logout and remove add item input and button
+        const logoutBtn = $("<button><b>Logout</b></button>").css({
+            "display": "inline-block"
+        }).hide().on("click", function () {
+            $(addCon).hide();
+            $(loginBtn).show();
+            $(signUpBtn).show()
+            $(logoutBtn).hide();
+            $(chgPwdBtn).hide();
+            alert("You have successfully logout.")
+            //document.location.reload();
+        });
+
+        //4. Access by admin
+        const addCon = $("<div></div>").css({
+            "width": "700px",
+            "height": "auto",
+            "margin": "auto",
+            "margin-top": "10px"
+        }).hide();
+
+        //5. login user data object
+        const admin = {
+            // name: "admin"
+        }
+
+        //6. Change password
+        const chgPwdBtn = $("<button><b>Change Password</b></button>").css({
+            "display": "inline-block"
+        }).hide().on("click", function () {
+            if (login[0].value.length > 3) {
+                localStorage.clear(admin.name);
+                admin.name = login[0].value;
+                login[0].value = "";
+                pwdObj = admin; // right place to put
+                alert("You have changed the password.");
+                adminLog = JSON.stringify(admin);
+                localStorage.setItem("objAd", adminLog);
+            } else {
+                alert("New password have to be more than 3 characters.")
+            }
+
+        });
+
+        //7. Add New Item input and button
+        let addItem = $("<input type='text' name='add' placeholder='Enter New Item'>").css({
+            "display": "inline-block"
+        });
+
+        let addCost = $("<input type='number' name='add' placeholder='Enter Item Price'>").css({
+            "display": "inline-block"
+        });
+
+        const addBtn = $("<button>Add Item</button>").css({
+            "display": "inline-block"
+        }).on("click", function () {
+            if (addItem[0].value !== "" && addCost[0].value !== "") {
+                addItemToList();
+            }
+        });
+
+        //8. Output selected item & total
+        const selectedItemOutput = $("<div></div>").css({
+            "width": "700px",
+            "height": "auto",
+            "margin": "auto",
+            "padding-top": "30px"
+        });
+
+        //9. Product container
+        const productCon = $("<div></div>").css({
+            "width": "700px",
+            "height": "400px",
+            "margin": "auto",
+            "padding-top": "30px",
+            "overflow-y": "auto"
+        });
+
+        //10. Registration container
+        const regPanel = $(
+            "<div><h1>For New User</h1><br></div>"
+        ).css({
+            "width": "700px",
+            "border": "2px solid black",
+            "text-align": "center",
+            "padding": "20px",
+            "margin": "auto"
+        }).hide();
+
+        const regInput = $(
+            "<input type='text' id='register' placeholder='Enter a password to register' style='width: 200px'>");
+
+        const regBtn = $("<button>Register</button>").on("click", function () {
+            //console.log(regInput[0].value);
+            if (regInput[0].value.length > 3 && Object.keys(admin).length === 0) {
+                admin.name = regInput[0].value;
+                pwdObj = admin; // right place to put
+                alert("You have registered successfully.");
+                regInput[0].value = "";
+            } else if (regInput[0].value === pwdObj.name) {
+                alert("This is a registered password.");
+                regInput[0].value = "";
+            } else {
+                alert("No registration for this device.");
+                regInput[0].value = "";
+            }
+            let adminLog = JSON.stringify(admin);
+            localStorage.setItem("objAd", adminLog);
+
+            $(regPanel).hide();
+            // document.location.reload();
+        });
+
+        // let adminLog = JSON.stringify(admin);
+        // localStorage.setItem("objAd", adminLog);
+
+        let pwdObj = JSON.parse(localStorage.getItem("objAd"));
+
+        $("body").append(panel, regPanel, addCon, selectedItemOutput, productCon);
+        $(panel).append(panelCon);
+        $(panelCon).append(title, login, loginBtn, signUpBtn, logoutBtn, chgPwdBtn);
+        $(addCon).append(addItem, addCost, addBtn);
+        $(regPanel).append(regInput, regBtn);
+
+        //11. Item list
+        const items = [];
+
+        //11.2 Add new item to items array
+        function Item(name, cost) {
+            this.name = name;
+            this.cost = cost;
+            // for 12 add tax and shipping cost
+            this.withTax = function () {
+                return (this.cost * 1.15).toFixed(2);
+            }
+            this.shipping = function () {
+                return (this.cost * 1.05).toFixed(2);
+            }
+        }
+
+        //11.3 Output items array
+        function addItemToList() {
+            let tempName = addItem[0].value;
+            let tempValue = addCost[0].value;
+            let tempItem = new Item(tempName, tempValue);
+            console.log(items);
+
+            let proItem = $("<div></div>").css({
+                "width": "140px",
+                "height": "auto",
+                "margin": "2px",
+                "padding": "10px",
+                "text-align": "center",
+                "display": "inline-block",
+                "border": "1px solid black"
+            }).html(`<h3>${tempName}</h3><br><h5>RM ${tempValue}</h5>`).on("click", function () {
+                cart.adder(tempName, tempValue);
+                cart.output()
+            });
+            addItem[0].value = "";
+            addCost[0].value = "";
+            $(productCon).append(proItem);
+        }
+
+        //12. Select item and add to cart
+        const cart = new Cart();
+
+        //12.1 Cart object with method
+        function Cart() {
+            const myList = {};
+
+            //12.2 Output myList object
+            this.output = function () {
+                let totalSelected = Object.keys(myList).length;
+                let totalQty = 0;
+                let totalAmt = 0;
+                selectedItemOutput.html("");
+
+                for (let pro in myList) {
+                    let subtotal = myList[pro].subtotal();
+                    let el = myList[pro];
+                    $(selectedItemOutput).append(`${el.name} RM ${el.price} x ${el.qty} = RM ${subtotal}<br>`)
+                    totalQty += el.qty
+                    totalAmt += subtotal;
+                }
+                $(selectedItemOutput).append(
+                    `<b>Selected Items: ${totalSelected} | Quantity: ${totalQty} | Total Amount: RM ${totalAmt}</b>`
+                );
+            }
+
+            // 12.3 To myList object
+            this.adder = function (item, cost) {
+                let namer = item.toLowerCase();
+                if (!myList[namer]) {
+                    myList[namer] = {
+                        name: item,
+                        price: cost,
+                        qty: 1,
+                        subtotal: function () {
+                            return this.price * this.qty;
+                        }
+                    }
+                } else {
+                    myList[namer].qty++;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
